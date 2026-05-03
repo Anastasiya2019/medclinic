@@ -266,36 +266,19 @@
             <span class="error-msg" :class="{show: errors.phone}">Введите корректный номер телефона</span>
           </div>
         </div>
-      </div>
-
-      <!-- БЛОК 2: данные о визите -->
-      <!-- БЛОК 1: личные данные -->
-      <div class="form-section">
-        <div class="section-title">Личные данные</div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Фамилия <span class="req">*</span></label>
-            <input type="text" v-model="form.lastName" placeholder="Иванова" :class="{invalid: errors.lastName}">
-            <span class="error-msg" :class="{show: errors.lastName}">Введите фамилию</span>
+            <label>Email для подтверждения <span class="req">*</span></label>
+            <input
+              type="email"
+              v-model="form.email"
+              placeholder="example@mail.ru"
+              :class="{invalid: errors.email}"
+            >
+            <span class="error-msg" :class="{show: errors.email}">Введите корректный email</span>
           </div>
-          <div class="form-group">
-            <label>Имя <span class="req">*</span></label>
-            <input type="text" v-model="form.firstName" placeholder="Мария" :class="{invalid: errors.firstName}">
-            <span class="error-msg" :class="{show: errors.firstName}">Введите имя</span>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Отчество</label>
-            <input type="text" v-model="form.middleName" placeholder="Александровна">
-          </div>
-          <div class="form-group">
-            <label>Контактный телефон <span class="req">*</span></label>
-            <input type="text" v-model="form.phone" placeholder="+7 (999) 123-45-67" :class="{invalid: errors.phone}">
-            <span class="error-msg" :class="{show: errors.phone}">Введите корректный номер телефона</span>
-          </div>
+          <div class="form-group"></div>
         </div>
       </div>
 
@@ -409,17 +392,7 @@
             <label>Аллергия на препараты</label>
             <input type="text" v-model="form.allergies" placeholder="Перечислите или укажите «нет»">
           </div>
-
-          <div class="form-group">
-            <label>Email для подтверждения <span class="req">*</span></label>
-            <input
-              type="email"
-              v-model="form.email"
-              placeholder="example@mail.ru"
-              :class="{invalid: errors.email}"
-            >
-            <span class="error-msg" :class="{show: errors.email}">Введите корректный email</span>
-          </div>
+          <div class="form-group"></div>
         </div>
       </div>
 
