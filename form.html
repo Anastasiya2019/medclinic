@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Запись к врачу — МедиПлюс</title>
+
+  <!-- Vue 3 через CDN — никаких установок не нужно -->
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.prod.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f8fd;
+      color: #333;
+      min-height: 100vh;
+    }
+
+    /* ===== ШАПКА ===== */
+    header {
+      background: #1a6fb5;
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+    header a { text-decoration: none; display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: white; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: bold; color: #1a6fb5;
+    }
+    .logo-text { color: white; font-size: 1.3em; font-weight: 600; }
+    .logo-sub  { color: rgba(255,255,255,0.75); font-size: 0.8em; margin-top: 1px; }
+
+    /* ===== ОБЁРТКА ФОРМЫ ===== */
+    .page-wrap {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 0 20px 60px;
+    }
+
+    .page-title {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #1a3a5c;
+      margin-bottom: 6px;
+    }
+
+    .page-sub {
+      font-size: 0.92em;
+      color: #666;
+      margin-bottom: 28px;
+    }
+
+    /* ===== БЛОКИ ФОРМЫ ===== */
+    .form-section {
+      background: white;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border-left: 4px solid #1a6fb5;
+    }
+
+    .section-title {
+      font-size: 0.82em;
+      font-weight: 700;
+      color: #1a6fb5;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 20px;
+    }
+
+    /* ===== ПОЛЯ ===== */
+    .form-row {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      font-size: 0.85em;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    .req { color: #e53935; margin-left: 2px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+      border: 1.5px solid #d0e0f0;
+      border-radius: 7px;
+      padding: 10px 13px;
+      font-size: 0.95em;
+      font-family: inherit;
+      color: #333;
+      background: #fafcff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: #1a6fb5;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(26,111,181,0.12);
+      background: white;
+    }
+
+    /* CSS3: стиль для невалидных полей после попытки отправки */
+    input.invalid, select.invalid, textarea.invalid {
+      border-color: #e53935;
+      box-shadow: 0 0 0 3px rgba(229,57,53,0.1);
+    }
+
+    .error-msg {
+      font-size: 0.78em;
+      color: #e53935;
+      margin-top: 4px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+      line-height: 1.5;
+    }
+
+    select { cursor: pointer; }
+
+    /* ===== ЧЕКБОКС ===== */
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      margin-top: 2px;
+      cursor: pointer;
+      accent-color: #1a6fb5;
+    }
+
+    .checkbox-row label {
+      font-weight: 400;
+      font-size: 0.88em;
+      color: #555;
+      cursor: pointer;
+    }
+
+    /* ===== КНОПКИ ===== */
+    .form-buttons {
+      display: flex;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .btn-submit {
+      background: #1a6fb5;
+      color: white;
+      border: none;
+      padding: 13px 36px;
+      border-radius: 8px;
+      font-size: 1em;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+    }
+
+    .btn-submit:hover {
+      background: #155a96;
+      transform: translateY(-1px);
+    }
+
+    .btn-reset {
+      background: white;
+      color: #1a6fb5;
+      border: 2px solid #1a6fb5;
+      padding: 13px 24px;
+      border-radius: 8px;
+      font-size: 1em;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-reset:hover { background: #f0f6ff; }
+
+    /* ===== АДАПТИВ ===== */
+    @media (max-width: 580px) {
+      .form-row { flex-direction: column; }
+      .form-buttons { flex-direction: column; }
+    }
+
+    footer {
+      background: #1a3a5c;
+      color: rgba(255,255,255,0.6);
+      text-align: center;
+      padding: 18px;
+      font-size: 0.83em;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html">
+      <div class="logo-icon">М</div>
+      <div>
+        <div class="logo-text">МедиПлюс</div>
+        <div class="logo-sub">Медицинский центр</div>
+      </div>
+    </a>
+  </header>
+
+  <!-- Корневой элемент Vue-приложения -->
+  <div id="app">
+    <div class="page-wrap">
+      <div class="page-title">Запись к врачу</div>
+      <div class="page-sub">Поля, отмеченные <span style="color:#e53935">*</span>, обязательны для заполнения</div>
+
+      <!-- БЛОК 1: данные о визите -->
+      <div class="form-section">
+        <div class="section-title">Данные о визите</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Специализация врача <span class="req">*</span></label>
+            <!-- v-model связывает выбор с переменной Vue -->
+            <select v-model="form.specialty" @change="onSpecialtyChange" :class="{invalid: errors.specialty}">
+              <option value="">— выберите —</option>
+              <option v-for="s in specialties" :key="s.value" :value="s.value">{{ s.label }}</option>
+            </select>
+            <span class="error-msg" :class="{show: errors.specialty}">Выберите специализацию</span>
+          </div>
+
+          <div class="form-group">
+            <label>Врач <span class="req">*</span></label>
+            <!-- Список врачей обновляется автоматически при смене специализации -->
+            <select v-model="form.doctor" :class="{invalid: errors.doctor}" :disabled="!form.specialty">
+              <option value="">— сначала выберите специализацию —</option>
+              <option v-for="d in availableDoctors" :key="d" :value="d">{{ d }}</option>
+            </select>
+            <span class="error-msg" :class="{show: errors.doctor}">Выберите врача</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Дата приёма <span class="req">*</span></label>
+            <!-- :min="today" запрещает выбор прошедших дат -->
+            <input type="date" v-model="form.date" :min="today" :class="{invalid: errors.date}">
+            <span class="error-msg" :class="{show: errors.date}">Выберите дату</span>
+          </div>
+
+          <div class="form-group">
+            <label>Время приёма <span class="req">*</span></label>
+            <select v-model="form.time" :class="{invalid: errors.time}">
+              <option value="">— выберите —</option>
+              <option v-for="t in timeSlots" :key="t" :value="t">{{ t }}</option>
+            </select>
+            <span class="error-msg" :class="{show: errors.time}">Выберите время</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Тип приёма <span class="req">*</span></label>
+            <select v-model="form.visitType" :class="{invalid: errors.visitType}">
+              <option value="">— выберите —</option>
+              <option value="primary">Первичный</option>
+              <option value="repeated">Повторный</option>
+              <option value="consultation">Консультация</option>
+            </select>
+            <span class="error-msg" :class="{show: errors.visitType}">Выберите тип приёма</span>
+          </div>
+          <div class="form-group"></div>
+        </div>
+      </div>
+
+      <!-- БЛОК 2: жалобы и симптомы -->
+      <div class="form-section">
+        <div class="section-title">Жалобы и симптомы</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Основные жалобы <span class="req">*</span></label>
+            <!-- maxlength — CSS3 не нужен, это HTML5-атрибут -->
+            <textarea
+              v-model="form.complaints"
+              maxlength="500"
+              placeholder="Опишите симптомы и причину обращения (не более 500 символов)"
+              :class="{invalid: errors.complaints}"
+            ></textarea>
+            <!-- Реактивный счётчик символов через Vue -->
+            <span style="font-size:0.78em;color:#999;margin-top:3px">{{ form.complaints.length }}/500</span>
+            <span class="error-msg" :class="{show: errors.complaints}">Опишите жалобы</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Как давно беспокоит <span class="req">*</span></label>
+            <select v-model="form.duration" :class="{invalid: errors.duration}">
+              <option value="">— выберите —</option>
+              <option value="1day">Менее суток</option>
+              <option value="few_days">Несколько дней</option>
+              <option value="week">Около недели</option>
+              <option value="month">Более месяца</option>
+              <option value="chronic">Хроническое</option>
+            </select>
+            <span class="error-msg" :class="{show: errors.duration}">Укажите длительность</span>
+          </div>
+
+          <div class="form-group">
+            <label>Температура тела</label>
+            <input
+              type="text"
+              v-model="form.temperature"
+              placeholder="Например: 37.2"
+              :class="{invalid: errors.temperature}"
+            >
+            <span class="error-msg" :class="{show: errors.temperature}">Введите значение от 35 до 42</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Аллергия на препараты</label>
+            <input type="text" v-model="form.allergies" placeholder="Перечислите или укажите «нет»">
+          </div>
+
+          <div class="form-group">
+            <label>Email для подтверждения <span class="req">*</span></label>
+            <input
+              type="email"
+              v-model="form.email"
+              placeholder="example@mail.ru"
+              :class="{invalid: errors.email}"
+            >
+            <span class="error-msg" :class="{show: errors.email}">Введите корректный email</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- БЛОК 3: согласие -->
+      <div class="form-section">
+        <div class="section-title">Согласие</div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="consent" v-model="form.consent">
+          <label for="consent">
+            Я даю согласие на обработку персональных данных и ознакомлен(а)
+            с политикой конфиденциальности клиники МедиПлюс. <span class="req">*</span>
+          </label>
+        </div>
+        <span class="error-msg" :class="{show: errors.consent}" style="display:block;margin-top:6px">
+          Необходимо дать согласие
+        </span>
+      </div>
+
+      <!-- Кнопки -->
+      <div class="form-buttons">
+        <button class="btn-submit" @click="submitForm">Записаться</button>
+        <button class="btn-reset"  @click="resetForm">Очистить</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 МедиПлюс. Все права защищены.</footer>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          // Сегодняшняя дата в формате YYYY-MM-DD (для атрибута min у поля даты)
+          today: new Date().toISOString().split('T')[0],
+
+          // Список специализаций
+          specialties: [
+            { value: 'therapist',       label: 'Терапевт' },
+            { value: 'cardiologist',    label: 'Кардиолог' },
+            { value: 'neurologist',     label: 'Невролог' },
+            { value: 'surgeon',         label: 'Хирург' },
+            { value: 'ophthalmologist', label: 'Окулист' },
+            { value: 'dermatologist',   label: 'Дерматолог' },
+          ],
+
+          // Врачи по специализациям
+          doctorsBySpecialty: {
+            therapist:       ['Иванова М.А.', 'Петров С.В.'],
+            cardiologist:    ['Смирнов К.Д.', 'Козлова Е.П.'],
+            neurologist:     ['Новиков А.Р.', 'Федорова Т.И.'],
+            surgeon:         ['Морозов В.Г.', 'Лебедев Д.Н.'],
+            ophthalmologist: ['Соколова И.В.', 'Волков М.С.'],
+            dermatologist:   ['Зайцева О.А.', 'Кузнецов Р.Б.'],
+          },
+
+          // Доступные слоты времени
+          timeSlots: ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'],
+
+          // Данные формы
+          form: {
+            specialty:   '',
+            doctor:      '',
+            date:        '',
+            time:        '',
+            visitType:   '',
+            complaints:  '',
+            duration:    '',
+            temperature: '',
+            allergies:   '',
+            email:       '',
+            consent:     false,
+          },
+
+          // Ошибки валидации
+          errors: {}
+        }
+      },
+
+      computed: {
+        // Список врачей зависит от выбранной специализации
+        availableDoctors() {
+          return this.doctorsBySpecialty[this.form.specialty] || [];
+        }
+      },
+
+      methods: {
+        // При смене специализации сбрасываем выбранного врача
+        onSpecialtyChange() {
+          this.form.doctor = '';
+        },
+
+        // Валидация формы перед отправкой
+        validate() {
+          const e = {};
+          if (!this.form.specialty)  e.specialty  = true;
+          if (!this.form.doctor)     e.doctor     = true;
+          if (!this.form.date)       e.date        = true;
+          if (!this.form.time)       e.time        = true;
+          if (!this.form.visitType)  e.visitType   = true;
+          if (!this.form.complaints.trim()) e.complaints = true;
+          if (!this.form.duration)   e.duration    = true;
+
+          // Валидация температуры — если введена, должна быть в диапазоне 35-42
+          if (this.form.temperature) {
+            const t = parseFloat(this.form.temperature.replace(',', '.'));
+            if (isNaN(t) || t < 35 || t > 42) e.temperature = true;
+          }
+
+          // Валидация email — обязательный, должен соответствовать формату
+          if (!this.form.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email)) {
+            e.email = true;
+          }
+
+          if (!this.form.consent) e.consent = true;
+
+          this.errors = e;
+          return Object.keys(e).length === 0;
+        },
+
+        // Отправка формы
+        submitForm() {
+          if (!this.validate()) return;
+
+          // Сохраняем данные в sessionStorage чтобы показать на странице подтверждения
+          sessionStorage.setItem('booking', JSON.stringify({
+            specialty: this.specialties.find(s => s.value === this.form.specialty)?.label,
+            doctor:    this.form.doctor,
+            date:      this.form.date,
+            time:      this.form.time,
+          }));
+
+          // Переход на страницу подтверждения
+          window.location.href = 'success.html';
+        },
+
+        // Сброс формы
+        resetForm() {
+          this.form = {
+            specialty: '', doctor: '', date: '', time: '',
+            visitType: '', complaints: '', duration: '',
+            temperature: '', allergies: '', email: '', consent: false
+          };
+          this.errors = {};
+        }
+      }
+    }).mount('#app');
+  </script>
+
+</body>
+</html>
